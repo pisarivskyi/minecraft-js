@@ -15,6 +15,7 @@
       {
         "props": false
       }
-    ]
+    ],
+    "class-methods-use-this": 0
   }
 }
