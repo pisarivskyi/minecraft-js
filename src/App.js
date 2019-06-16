@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import 'three/examples/js/controls/OrbitControls';
-import Cube from './Cube';
+import ResourceLoader from './ResourceLoader';
+import Level from './Level';
+
+const texture = require('../assets/textures/dirt.png');
 
 /**
  * Main app class
@@ -17,26 +20,30 @@ export default class App {
    * Init scene
    */
   init() {
+    this.resourceLoader = new ResourceLoader();
+
     this.clock = new THREE.Clock();
     this.deltaTime = 0;
+
+    // define scene object
+    this.scene = new THREE.Scene();
+
+    // setup camera
     const aspect = this.container.offsetWidth / this.container.offsetHeight;
     this.camera = new THREE.PerspectiveCamera(60, aspect, 1, 10000000);
     this.camera.position.z = 10;
-
-    this.scene = new THREE.Scene();
     this.scene.add(this.camera);
 
+    // set up lightning
     const light = new THREE.HemisphereLight(0xeeeeee, 0x888888, 0.5);
     light.position.set(0, 20, 0);
     this.scene.add(light);
 
-    const cube = new Cube({
-      material: new THREE.MeshBasicMaterial({
-        color: 0xff0000,
-      }),
-    });
-    this.scene.add(cube);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    directionalLight.position.set(0, 20, 0);
+    this.scene.add(directionalLight);
 
+    // set up renderer
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setClearColor(new THREE.Color(0xFFFFFF));
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -45,6 +52,7 @@ export default class App {
 
     this.container.appendChild(this.renderer.domElement);
 
+    // setup controls
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.25;
@@ -76,6 +84,20 @@ export default class App {
    */
   animate(deltaTime) {
 
+  }
+
+  loadLevel() {
+    this.resourceLoader.load({
+      textures: {
+        dirtTexture: texture,
+      },
+    })
+      .then((resources) => {
+        const level = new Level('my first seed', resources);
+        const objects = level.generate();
+        this.scene.add(objects);
+      })
+      .catch(err => console.log(err));
   }
 
   /**
