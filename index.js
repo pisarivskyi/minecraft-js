@@ -1,6 +1,4 @@
-// expose THREE object
-import * as THREE from 'three';
-global.THREE = THREE;
+import App from './src/App';
 
-console.log('init');
-console.log(THREE);
+const app = new App();
+app.init();
