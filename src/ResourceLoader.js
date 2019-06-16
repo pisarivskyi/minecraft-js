@@ -71,7 +71,14 @@ export default class ResourceLoader {
     return new Promise((resolve, reject) => {
       const loader = new THREE.TextureLoader();
 
-      return loader.load(textureUrl, texture => resolve(texture), null, err => reject(err));
+      return loader.load(textureUrl, (texture) => {
+        if (texture) {
+          texture.magFilter = THREE.NearestFilter;
+          texture.minFilter = THREE.LinearMipMapLinearFilter;
+        }
+
+        resolve(texture);
+      }, null, err => reject(err));
     });
   }
 }
