@@ -28,7 +28,6 @@ export default class App {
 
     const light = new THREE.HemisphereLight(0xeeeeee, 0x888888, 0.5);
     light.position.set(0, 20, 0);
-
     this.scene.add(light);
 
     const cube = new Cube({
