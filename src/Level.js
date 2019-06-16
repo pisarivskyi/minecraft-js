@@ -8,6 +8,7 @@ export default class Level {
     this.resources = resources;
     this.scale = 100;
     this.gridSize = 30;
+    this.geometryOptimization = true;
   }
 
   normalize(val, max, min) {
@@ -21,55 +22,70 @@ export default class Level {
       for (let z = 0; z < this.gridSize; z += 1) {
         const y = Math.round(this.normalize(this.simplex.noise2D(x / this.scale, z / this.scale), -10, 10));
 
-        const isConnectedToTheRight = y === Math.round(
-          this.normalize(
-            this.simplex.noise2D((x + 1) / this.scale, z / this.scale), -10, 10,
-          ),
-        );
+        let otherOptions = {};
 
-        const isConnectedToTheLeft = y === Math.round(
-          this.normalize(
-            this.simplex.noise2D((x - 1) / this.scale, z / this.scale), -10, 10,
-          ),
-        );
+        if (this.geometryOptimization) {
+          const isConnectedToTheRight = y === Math.round(
+            this.normalize(
+              this.simplex.noise2D((x + 1) / this.scale, z / this.scale), -10, 10,
+            ),
+          );
 
-        const isConnectedToTheFront = y === Math.round(
-          this.normalize(
-            this.simplex.noise2D(x / this.scale, (z + 1) / this.scale), -10, 10,
-          ),
-        );
+          const isConnectedToTheLeft = y === Math.round(
+            this.normalize(
+              this.simplex.noise2D((x - 1) / this.scale, z / this.scale), -10, 10,
+            ),
+          );
 
-        const isConnectedToTheBack = y === Math.round(
-          this.normalize(
-            this.simplex.noise2D(x / this.scale, (z - 1) / this.scale), -10, 10,
-          ),
-        );
+          const isConnectedToTheFront = y === Math.round(
+            this.normalize(
+              this.simplex.noise2D(x / this.scale, (z + 1) / this.scale), -10, 10,
+            ),
+          );
 
-        // edge connected
-        const isEdgeConnectedRight = y + 1 === Math.round(
-          this.normalize(
-            this.simplex.noise2D((x + 1) / this.scale, z / this.scale), -10, 10,
-          ),
-        );
+          const isConnectedToTheBack = y === Math.round(
+            this.normalize(
+              this.simplex.noise2D(x / this.scale, (z - 1) / this.scale), -10, 10,
+            ),
+          );
 
-        const isEdgeConnectedLeft = y + 1 === Math.round(
-          this.normalize(
-            this.simplex.noise2D((x - 1) / this.scale, z / this.scale), -10, 10,
-          ),
-        );
+          // edge connected
+          const isEdgeConnectedRight = y + 1 === Math.round(
+            this.normalize(
+              this.simplex.noise2D((x + 1) / this.scale, z / this.scale), -10, 10,
+            ),
+          );
 
-        const isEdgeConnectedFront = y + 1 === Math.round(
-          this.normalize(
-            this.simplex.noise2D(x / this.scale, (z + 1) / this.scale), -10, 10,
-          ),
-        );
+          const isEdgeConnectedLeft = y + 1 === Math.round(
+            this.normalize(
+              this.simplex.noise2D((x - 1) / this.scale, z / this.scale), -10, 10,
+            ),
+          );
 
-        const isEdgeConnectedBack = y + 1 === Math.round(
-          this.normalize(
-            this.simplex.noise2D(x / this.scale, (z - 1) / this.scale), -10, 10,
-          ),
-        );
+          const isEdgeConnectedFront = y + 1 === Math.round(
+            this.normalize(
+              this.simplex.noise2D(x / this.scale, (z + 1) / this.scale), -10, 10,
+            ),
+          );
 
+          const isEdgeConnectedBack = y + 1 === Math.round(
+            this.normalize(
+              this.simplex.noise2D(x / this.scale, (z - 1) / this.scale), -10, 10,
+            ),
+          );
+
+          otherOptions = {
+            isConnectedToTheRight,
+            isConnectedToTheLeft,
+            isConnectedToTheFront,
+            isConnectedToTheBack,
+
+            isEdgeConnectedRight,
+            isEdgeConnectedLeft,
+            isEdgeConnectedFront,
+            isEdgeConnectedBack,
+          };
+        }
         const cube = new Cube({
           material: new THREE.MeshStandardMaterial({
             map: this.resources.textures.dirtTexture,
@@ -81,15 +97,7 @@ export default class Level {
             side: THREE.FrontSide,
           }),
           position: new THREE.Vector3(x, y, z),
-          isConnectedToTheRight,
-          isConnectedToTheLeft,
-          isConnectedToTheFront,
-          isConnectedToTheBack,
-
-          isEdgeConnectedRight,
-          isEdgeConnectedLeft,
-          isEdgeConnectedFront,
-          isEdgeConnectedBack,
+          ...otherOptions,
         });
         objects.add(cube);
       }
