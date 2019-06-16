@@ -60,7 +60,7 @@ export default class App {
    * Render level
    */
   render() {
-    window.requestAnimationFrame(this.animate.bind(this));
+    window.requestAnimationFrame(this.render.bind(this));
     this.deltaTime = this.clock.getDelta();
 
     this.animate(this.deltaTime);
