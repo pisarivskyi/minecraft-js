@@ -3,8 +3,6 @@ import 'three/examples/js/controls/OrbitControls';
 import ResourceLoader from './ResourceLoader';
 import Level from './Level';
 
-const texture = require('../assets/textures/dirt.png');
-
 /**
  * Main app class
  */
@@ -27,6 +25,7 @@ export default class App {
 
     // define scene object
     this.scene = new THREE.Scene();
+    this.scene.fog = new THREE.Fog(0x31a8f7, 100, 200);
 
     // setup camera
     const aspect = this.container.offsetWidth / this.container.offsetHeight;
@@ -39,13 +38,13 @@ export default class App {
     light.position.set(0, 20, 0);
     this.scene.add(light);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(0, 20, 0);
     this.scene.add(directionalLight);
 
     // set up renderer
     this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setClearColor(new THREE.Color(0xFFFFFF));
+    this.renderer.setClearColor(new THREE.Color(0x31a8f7));
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(this.container.offsetWidth, this.container.offsetHeight);
     this.renderer.shadowMap.enabled = true;
@@ -89,7 +88,8 @@ export default class App {
   loadLevel() {
     this.resourceLoader.load({
       textures: {
-        dirtTexture: texture,
+        dirtTexture: require('../assets/textures/grass_side.png'),
+        dirtTop: require('../assets/textures/grass_top.png'),
       },
     })
       .then((resources) => {
