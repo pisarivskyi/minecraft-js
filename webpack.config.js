@@ -1,5 +1,6 @@
 /* eslint import/no-dynamic-require: 0 */
 const path = require('path');
+const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -20,6 +21,9 @@ const shouldGenSourceMap = mode !== 'production';
  * Plugins
  */
 const plugins = [
+  new webpack.ProvidePlugin({
+    THREE: 'three',
+  }),
   new HtmlWebpackPlugin({
     filename: 'index.html',
     template: path.resolve('index.html'),
